@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:medical_healthcare/network/api/url_api.dart';
 import 'package:medical_healthcare/theme.dart';
 import 'package:medical_healthcare/widget/button_primary.dart';
 import 'package:medical_healthcare/widget/general_logo_space.dart';
+import 'package:http/http.dart' as http;
 
 class RegisterPage extends StatefulWidget {
   @override
@@ -9,12 +13,56 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  TextEditingController _name = TextEditingController();
+  TextEditingController _email = TextEditingController();
+  TextEditingController _phone = TextEditingController();
+  TextEditingController _address = TextEditingController();
+  TextEditingController _password = TextEditingController();
+
   bool _secureText = true;
   showHide() {
     setState(() {
       _secureText = !_secureText;
     });
   }
+
+  registerSubmit() async {
+    var registerUrl = Uri.parse(BASEURL.apiRegister);
+    final response = await http.post(registerUrl, body: {
+      "fullname": _name.text,
+      "email": _email.text,
+      "phone": _phone.text,
+      "address": _address.text,
+      "password": _password.text,
+    });
+    final data = jsonDecode(response.body);
+    int value = data['value'];
+    String message = data['message'];
+    if(value == 1) {
+      showDialog(
+        context: context, 
+        builder: (context) => AlertDialog(
+          title: Text("Information"),
+          content: Text(message),
+          actions: [TextButton(onPressed: () {}, child: Text("OK"),)],
+        )
+      );
+      setState(() {});
+    } else {
+      showDialog(
+        context: context, 
+        builder: (context) => AlertDialog(
+          title: Text("Information"),
+          content: Text(message),
+          actions: [TextButton(onPressed: () {
+            Navigator.pop(context);
+          }, child: Text("OK"),)],
+        )
+      );
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +107,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   width: MediaQuery.of(context).size.width,
                   child: TextField(
+                    controller: _name,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Full Name',
@@ -88,6 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   width: MediaQuery.of(context).size.width,
                   child: TextField(
+                    controller: _email,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Email Address',
@@ -117,6 +167,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   width: MediaQuery.of(context).size.width,
                   child: TextField(
+                    controller: _phone,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Phone',
@@ -146,6 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   width: MediaQuery.of(context).size.width,
                   child: TextField(
+                    controller: _address,
                     decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Home Address',
@@ -175,6 +227,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   width: MediaQuery.of(context).size.width,
                   child: TextField(
+                    controller: _password,
                     obscureText: _secureText,
                     decoration: InputDecoration(
                       suffixIcon: IconButton(
@@ -196,7 +249,22 @@ class _RegisterPageState extends State<RegisterPage> {
                   width: MediaQuery.of(context).size.width,
                   child: ButtonPrimary(
                     text: 'REGISTER',
-                    onTap: () {},
+                    onTap: () {
+                      if (_name.text.isEmpty || _email.text.isEmpty || _phone.text.isEmpty || _address.text.isEmpty || _password.text.isEmpty) {
+                        showDialog(
+                          context: context, 
+                          builder: (context) => AlertDialog(
+                            title: Text("Warning"),
+                            content: Text("Please fill all the field"),
+                            actions: [TextButton(onPressed: () {
+                              Navigator.pop(context);
+                            }, child: Text("OK"),)],
+                          )
+                        );
+                      } else {
+                        registerSubmit();
+                      }
+                    },
                   ),
                 ),
                 SizedBox(
