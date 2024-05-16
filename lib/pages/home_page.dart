@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medical_healthcare/theme.dart';
+import 'package:medical_healthcare/widget/card_product.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -71,6 +72,7 @@ class _HomePageState extends State<HomePage> {
               "Medicine & Vitamins by Category",
               style: regulerTextStyle.copyWith(fontSize: 16),
             ),
+            CardProduct(),
           ],
         ),
       ),
