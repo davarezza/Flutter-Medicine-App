@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medical_healthcare/pages/register_page.dart';
+import 'package:medical_healthcare/pages/login_page.dart';
 import 'package:medical_healthcare/widget/button_primary.dart';
 import 'package:medical_healthcare/widget/general_logo_space.dart';
 import 'package:medical_healthcare/widget/widget_ilustration.dart';
@@ -26,7 +26,7 @@ class SplashScreen extends StatelessWidget {
                         onTap: () {
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => RegisterPage()),
+                            MaterialPageRoute(builder: (context) => LoginPage()),
                           );
                         },
                       ),

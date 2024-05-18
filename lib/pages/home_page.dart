@@ -119,30 +119,33 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 14,
             ),
-            GridView.builder(
-              physics: ClampingScrollPhysics(),
-              itemCount: listCategory.length,
-              shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 10,
+            Flexible(
+              child: GridView.builder(
+                physics: ClampingScrollPhysics(),
+                itemCount: listCategory.length,
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 3 / 4,
+                ),
+                itemBuilder: (context, i) {
+                  final x = listCategory[i];
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        index = i;
+                        filter = true;
+                        print("$index, $filter");
+                      });
+                    },
+                    child: CardCategory(
+                      imageCategory: x.image, 
+                      nameCategory: x.category,
+                    ),
+                  );
+                },
               ),
-              itemBuilder: (context, i) {
-                final x = listCategory[i];
-                return InkWell(
-                  onTap: () {
-                    setState(() {
-                      index = i;
-                      filter = true;
-                      print("$index, $filter");
-                    });
-                  },
-                  child: CardCategory(
-                    imageCategory: x.image, 
-                    nameCategory: x.category,
-                  ),
-                );
-              },
             ),
             SizedBox(
               height: 32,

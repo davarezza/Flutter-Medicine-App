@@ -13,17 +13,18 @@ class CategoryWithProduct {
       required this.product});
 
   factory CategoryWithProduct.fromJson(Map<String, dynamic> data) {
-    var list = data['product'] as List;
-    List<ProductModel> listProduct = 
-      list.map((e) => ProductModel.fromJson(e)).toList();
-    return CategoryWithProduct(
-      idCategory: data['idCategory'],
-      category: data['category'],
-      image: data['image'],
-      status: data['status'],
-      product: listProduct,
-    );
-  }
+  var list = data['product'] as List? ?? [];
+  List<ProductModel> listProduct = 
+    list.map((e) => ProductModel.fromJson(e)).toList();
+  return CategoryWithProduct(
+    idCategory: data['idCategory']?.toString() ?? '',
+    category: data['category']?.toString() ?? '',
+    image: data['image']?.toString() ?? '',
+    status: data['status']?.toString() ?? '',
+    product: listProduct,
+  );
+}
+
 }
 
 class ProductModel {
@@ -47,15 +48,16 @@ class ProductModel {
       required this.createdAt});
       
   factory ProductModel.fromJson(Map<String, dynamic> data) {
-    return ProductModel(
-      idProduct: data['idProduct'],
-      idCategory: data['idCategory'],
-      nameProduct: data['nameProduct'],
-      description: data['description'],
-      imageProduct: data['imageProduct'],
-      price: data['price'],
-      status: data['status'],
-      createdAt: data['createdAt'],
-    );
-  }
+  return ProductModel(
+    idProduct: data['id_product']?.toString() ?? '',
+    idCategory: data['id_category']?.toString() ?? '',
+    nameProduct: data['name']?.toString() ?? '',
+    description: data['description']?.toString() ?? '',
+    imageProduct: data['image']?.toString() ?? '',
+    price: data['price']?.toString() ?? '',
+    status: data['status']?.toString() ?? '',
+    createdAt: data['created_at']?.toString() ?? '',
+  );
+}
+
 }
