@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medical_healthcare/network/api/url_api.dart';
 import 'package:medical_healthcare/network/model/product_model.dart';
+import 'package:medical_healthcare/pages/detail_product.dart';
 import 'package:medical_healthcare/pages/search_product.dart';
 import 'package:medical_healthcare/theme.dart';
 import 'package:medical_healthcare/widget/card_category.dart';
@@ -181,10 +182,18 @@ class _HomePageState extends State<HomePage> {
                     ),
                     itemBuilder: (context, i) {
                       final y = listCategory[index].product[i];
-                      return CardProduct(
-                        nameProduct: y.nameProduct, 
-                        imageProduct: y.imageProduct, 
-                        priceProduct: y.price,
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => DetailProduct(productModel: y,)));
+                        },
+                        child: CardProduct(
+                          nameProduct: y.nameProduct, 
+                          imageProduct: y.imageProduct, 
+                          priceProduct: y.price,
+                        ),
                       ); 
                     },
                   ) : GridView.builder(
@@ -198,10 +207,18 @@ class _HomePageState extends State<HomePage> {
                     ),
                     itemBuilder: (context, i) {
                       final y = listProduct[i];
-                      return CardProduct(
-                        nameProduct: y.nameProduct, 
-                        imageProduct: y.imageProduct, 
-                        priceProduct: y.price,
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => DetailProduct(productModel: y,)));
+                        },
+                        child: CardProduct(
+                          nameProduct: y.nameProduct, 
+                          imageProduct: y.imageProduct, 
+                          priceProduct: y.price,
+                        ),
                       ); 
                     },
                   ),

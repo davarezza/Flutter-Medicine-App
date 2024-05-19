@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medical_healthcare/network/api/url_api.dart';
 import 'package:medical_healthcare/network/model/product_model.dart';
+import 'package:medical_healthcare/pages/detail_product.dart';
 import 'package:medical_healthcare/theme.dart';
 import 'package:http/http.dart' as http;
 import 'package:medical_healthcare/widget/card_product.dart';
@@ -85,6 +86,7 @@ class _SearchProductState extends State<SearchProduct> {
                         color: Color(0xffe4faf0)),
                     child: TextField(
                       onChanged: (text) => searchProduct(),
+                      autofocus: true,
                       controller: searchController,
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -125,11 +127,19 @@ class _SearchProductState extends State<SearchProduct> {
                     ),
                     itemBuilder: (context, i) {
                       final y = listSearchProduct[i];
-                      return CardProduct(
-                      nameProduct: y.nameProduct, 
-                      imageProduct: y.imageProduct, 
-                      priceProduct: y.price,
-                    ); 
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context, 
+                            MaterialPageRoute(
+                              builder: (context) => DetailProduct(productModel: y,)));
+                        },
+                        child: CardProduct(
+                        nameProduct: y.nameProduct, 
+                        imageProduct: y.imageProduct, 
+                        priceProduct: y.price,
+                        ),
+                      ); 
                   },
                 ),
             ),
