@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:medical_healthcare/network/api/url_api.dart';
 import 'package:medical_healthcare/network/model/product_model.dart';
+import 'package:medical_healthcare/pages/search_product.dart';
 import 'package:medical_healthcare/theme.dart';
 import 'package:medical_healthcare/widget/card_category.dart';
 import 'package:http/http.dart' as http;
@@ -90,22 +91,31 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 16,
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-              height: 55,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Color(0xffe4faf0)
-              ),
-              child: TextField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Color(0xffb1d8b2),
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => SearchProduct())
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+                height: 55,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Color(0xffe4faf0)
+                ),
+                child: TextField(
+                  enabled: false,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Color(0xffb1d8b2),
+                    ),
+                    hintText: "Search Medicine ...",
+                    hintStyle: regulerTextStyle.copyWith(color: Color(0xffb1d8b2)),
                   ),
-                  hintText: "Search Medicine ...",
-                  hintStyle: regulerTextStyle.copyWith(color: Color(0xffb1d8b2)),
                 ),
               ),
             ),
