@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:medical_healthcare/main_page.dart';
 import 'package:medical_healthcare/network/api/url_api.dart';
 import 'package:medical_healthcare/network/model/cart_model.dart';
 import 'package:medical_healthcare/network/model/pref_profile_model.dart';
 import 'package:medical_healthcare/theme.dart';
 import 'package:medical_healthcare/widget/button_primary.dart';
+import 'package:medical_healthcare/widget/widget_ilustration.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,6 +17,7 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+  final price = NumberFormat("#,##0", "EN_US");
   String? userID, name, address, phone;
   int delivery = 0;
 
@@ -27,6 +31,7 @@ class _CartPageState extends State<CartPage> {
     });
     if (userID != null) {
       getCart(userID!);
+      cartTotalPrice();
     }
   }
 
@@ -47,6 +52,45 @@ class _CartPageState extends State<CartPage> {
     }
   }
 
+  updateQuantity(String tipe, String model) async {
+    var urlUpdateQuantity = Uri.parse(BASEURL.updateQuantityProductCart);
+    final response = await http.post(urlUpdateQuantity, body: {
+      "cartID": model,
+      "tipe": tipe
+    });
+    final data = jsonDecode(response.body);
+    int value = data['value'];
+    String message = data['message'];
+    if (value == 1) {
+      print(message);
+      setState(() {
+        getPref();
+      });
+    } else {
+      print(message);
+      setState(() {
+        getPref();
+      });
+    }
+  }
+
+  var sumPrice = "0";
+  int totalPayment = 0;
+  cartTotalPrice() async {
+    var urlTotalPrice = Uri.parse(BASEURL.totalPriceCart + userID!);
+    final response = await http.get(urlTotalPrice);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      String total = data['Total'];
+      setState(() {
+        sumPrice = total;
+        // ignore: unnecessary_null_comparison
+        totalPayment = sumPrice == null ? 0 : int.parse(sumPrice) + delivery;
+      });
+      print(sumPrice);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,9 +102,9 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       backgroundColor: whiteColor,
-      bottomNavigationBar: Container(
+      bottomNavigationBar: listCart.isNotEmpty ? Container(
         padding: EdgeInsets.all(24),
-        height: 220,
+        height: 234,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: Color(0xfffcfcfc),
@@ -69,246 +113,258 @@ class _CartPageState extends State<CartPage> {
             topRight: Radius.circular(30),
           ),
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Total Items",
-                    style: regulerTextStyle.copyWith(
-                      fontSize: 14,
-                      color: greyBoldColor,
-                    ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Total Items",
+                  style: regulerTextStyle.copyWith(
+                    fontSize: 14,
+                    color: greyBoldColor,
                   ),
-                  Text(
-                    "IDR 180.000",
-                    style: boldTextStyle.copyWith(fontSize: 14),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Delivery Fee",
-                    style: regulerTextStyle.copyWith(
-                      fontSize: 14,
-                      color: greyBoldColor,
-                    ),
-                  ),
-                  Text(
-                    delivery == 0 ? "FREE" : "IDR $delivery",
-                    style: boldTextStyle.copyWith(fontSize: 14),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Total Payment",
-                    style: regulerTextStyle.copyWith(
-                      fontSize: 14,
-                      color: greyBoldColor,
-                    ),
-                  ),
-                  Text(
-                    "IDR 180.000",
-                    style: boldTextStyle.copyWith(fontSize: 14),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: ButtonPrimary(
-                  onTap: () {},
-                  text: "CHECKOUT NOW",
                 ),
+                Text(
+                  "IDR " + price.format(int.parse(sumPrice)),
+                  style: boldTextStyle.copyWith(fontSize: 14),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Delivery Fee",
+                  style: regulerTextStyle.copyWith(
+                    fontSize: 14,
+                    color: greyBoldColor,
+                  ),
+                ),
+                Text(
+                  delivery == 0 ? "FREE" : "IDR $delivery",
+                  style: boldTextStyle.copyWith(fontSize: 14),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 16,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Total Payment",
+                  style: regulerTextStyle.copyWith(
+                    fontSize: 14,
+                    color: greyBoldColor,
+                  ),
+                ),
+                Text(
+                  "IDR " + price.format(totalPayment),
+                  style: boldTextStyle.copyWith(fontSize: 14),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              child: ButtonPrimary(
+                onTap: () {},
+                text: "CHECKOUT NOW",
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
+      ) : null, // Hide if listCart is empty
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back_rounded,
-                        size: 32,
-                        color: greenColor,
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.arrow_back_rounded,
+                      size: 32,
+                      color: greenColor,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 30,
+                  ),
+                  Text(
+                    "My Cart",
+                    style: regulerTextStyle.copyWith(
+                      fontSize: 25,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 18,
+            ),
+            Expanded(
+              child: listCart.isEmpty
+                ? Container(
+                  padding: EdgeInsets.all(16),
+                  margin: EdgeInsets.only(top: 10),
+                  child: WidgetIlustration(
+                      image: "assets/empty_cart_ilustration.png",
+                      title: "There are no products in your cart",
+                      subtitle1: "Your cart is still empty",
+                      subtitle2: "Find the products",
+                      child: Container(
+                        margin: EdgeInsets.only(top: 10),
+                        width: MediaQuery.of(context).size.width,
+                        child: ButtonPrimary(
+                          text: "SHOPPING NOW",
+                          onTap: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MainPage()),
+                                (route) => false
+                            );
+                          },
+                        ),
                       ),
                     ),
-                    SizedBox(
-                      width: 30,
-                    ),
-                    Text(
-                      "My Cart",
-                      style: regulerTextStyle.copyWith(
-                        fontSize: 25,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 18,
-              ),
-              Padding(
-                padding: EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Delivery Destination",
-                      style: regulerTextStyle.copyWith(fontSize: 18),
-                    ),
-                    SizedBox(
-                      height: 16,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Name",
-                          style: regulerTextStyle.copyWith(
-                            fontSize: 14,
-                            color: greyBoldColor,
-                          ),
-                        ),
-                        Text(
-                          "$name",
-                          style: boldTextStyle.copyWith(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Address",
-                          style: regulerTextStyle.copyWith(
-                            fontSize: 14,
-                            color: greyBoldColor,
-                          ),
-                        ),
-                        Text(
-                          "$address",
-                          style: boldTextStyle.copyWith(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Phone",
-                          style: regulerTextStyle.copyWith(
-                            fontSize: 14,
-                            color: greyBoldColor,
-                          ),
-                        ),
-                        Text(
-                          "$phone",
-                          style: boldTextStyle.copyWith(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: listCart.length,
-                itemBuilder: (context, i) {
-                  final x = listCart[i];
-                  return Container(
-                    padding: EdgeInsets.all(24),
-                    color: whiteColor,
-                    child: Column(
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.network(
-                              x.image,
-                              width: 115,
-                              height: 100,
-                            ),
-                            SizedBox(width: 10), // Added space between image and column
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                )
+                : ListView.builder(
+                    itemCount: listCart.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Padding(
+                          padding: EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Delivery Destination",
+                                style: regulerTextStyle.copyWith(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 16,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    x.name,
-                                    style: regulerTextStyle.copyWith(fontSize: 16),
-                                  ),
-                                  Row(
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.add_circle,
-                                          color: greenColor,
-                                        ),
-                                        onPressed: () {},
-                                      ),
-                                      Text(x.quantity.toString()),
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.remove_circle,
-                                          color: Color(0xfff0997a),
-                                        ),
-                                        onPressed: () {},
-                                      ),
-                                    ],
+                                    "Name",
+                                    style: regulerTextStyle.copyWith(
+                                      fontSize: 14,
+                                      color: greyBoldColor,
+                                    ),
                                   ),
                                   Text(
-                                    x.price.toString(),
-                                    style: boldTextStyle.copyWith(fontSize: 16),
+                                    "$name",
+                                    style: boldTextStyle.copyWith(fontSize: 14),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                        Divider(),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Address",
+                                    style: regulerTextStyle.copyWith(
+                                      fontSize: 14,
+                                      color: greyBoldColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    "$address",
+                                    style: boldTextStyle.copyWith(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 8,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Phone",
+                                    style: regulerTextStyle.copyWith(
+                                      fontSize: 14,
+                                      color: greyBoldColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    "$phone",
+                                    style: boldTextStyle.copyWith(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        int itemIndex = index - 1; // Adjust index for the header
+                        return ListTile(
+                          leading: Image.network(
+                            listCart[itemIndex].image,
+                            width: 115,
+                            height: 100,
+                          ),
+                          title: Text(
+                            listCart[itemIndex].name,
+                            style: regulerTextStyle.copyWith(fontSize: 16),
+                          ),
+                          subtitle: Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.add_circle,
+                                  color: greenColor,
+                                ),
+                                onPressed: () {
+                                  updateQuantity("tambah", listCart[itemIndex].idCart);
+                                },
+                              ),
+                              Text(listCart[itemIndex].quantity),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.remove_circle,
+                                  color: Color(0xfff0997a),
+                                ),
+                                onPressed: () {
+                                  updateQuantity("kurang", listCart[itemIndex].idCart);
+                                },
+                              ),
+                            ],
+                          ),
+                          trailing: Text(
+                            "IDR" + price.format(int.parse(listCart[itemIndex].price)),
+                            style: boldTextStyle.copyWith(fontSize: 16),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+
