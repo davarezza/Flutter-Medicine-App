@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:medical_healthcare/network/api/url_api.dart';
+import 'package:medical_healthcare/network/model/pref_profile_model.dart';
 import 'package:medical_healthcare/network/model/product_model.dart';
 import 'package:medical_healthcare/pages/cart_page.dart';
 import 'package:medical_healthcare/pages/detail_product.dart';
@@ -10,6 +12,7 @@ import 'package:medical_healthcare/theme.dart';
 import 'package:medical_healthcare/widget/card_category.dart';
 import 'package:http/http.dart' as http;
 import 'package:medical_healthcare/widget/card_product.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,6 +20,7 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
+
 class _HomePageState extends State<HomePage> {
   late int index;
   bool filter = false;
@@ -29,10 +33,12 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         final data = jsonDecode(response.body) as List<dynamic>;
         for (var item in data) {
-          listCategory.add(CategoryWithProduct.fromJson(item as Map<String, dynamic>));
+          listCategory
+              .add(CategoryWithProduct.fromJson(item as Map<String, dynamic>));
         }
       });
       getProduct();
+      totalCart();
     }
   }
 
@@ -45,8 +51,31 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         final data = jsonDecode(response.body) as List<dynamic>;
         for (var product in data) {
-          listProduct.add(ProductModel.fromJson(product as Map<String, dynamic>));
+          listProduct
+              .add(ProductModel.fromJson(product as Map<String, dynamic>));
         }
+      });
+    }
+  }
+
+  late String userID;
+  getPref() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      userID = sharedPreferences.getString(PrefProfile.idUser)!;
+    });
+  }
+
+  var jumlahCart = "0";
+  totalCart() async {
+    var urlGetTotalCart = Uri.parse(BASEURL.getTotalCart + userID);
+    final response = await http.get(urlGetTotalCart);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)[0];
+      String jumlah = data['Jumlah'];
+      setState(() {
+        jumlahCart = jumlah;
       });
     }
   }
@@ -54,6 +83,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    getPref();
     getCategory();
   }
 
@@ -76,22 +106,49 @@ class _HomePageState extends State<HomePage> {
                       width: 155,
                     ),
                     SizedBox(height: 16),
-                    Text("Find a Medicine or\nVitamins with MEDHEALTH!", 
-                    style: regulerTextStyle.copyWith(fontSize: 15, color: greyBoldColor),
+                    Text(
+                      "Find a Medicine or\nVitamins with MEDHEALTH!",
+                      style: regulerTextStyle.copyWith(
+                          fontSize: 15, color: greyBoldColor),
                     ),
                   ],
                 ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context, 
-                      MaterialPageRoute(builder: (context) => CartPage())
-                    );
-                  },
-                  icon: Icon(
-                    Icons.shopping_cart_outlined, 
-                    color: greenColor,
-                  ),
+                Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CartPage()));
+                      },
+                      icon: Icon(
+                        Icons.shopping_cart_outlined,
+                        color: greenColor,
+                      ),
+                    ),
+                    jumlahCart == "0"
+                        ? SizedBox.shrink()
+                        : Positioned(
+                            right: 6,
+                            top: 3,
+                            child: Container(
+                              height: 15,
+                              width: 15,
+                              decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(30)),
+                              child: Center(
+                                child: Text(
+                                  jumlahCart,
+                                  style: regulerTextStyle.copyWith(
+                                      color: whiteColor, fontSize: 12),
+                                      textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ),
+                  ],
                 ),
               ],
             ),
@@ -100,18 +157,15 @@ class _HomePageState extends State<HomePage> {
             ),
             InkWell(
               onTap: () {
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => SearchProduct())
-                );
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SearchProduct()));
               },
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                 height: 55,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Color(0xffe4faf0)
-                ),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Color(0xffe4faf0)),
                 child: TextField(
                   enabled: false,
                   decoration: InputDecoration(
@@ -121,7 +175,8 @@ class _HomePageState extends State<HomePage> {
                       color: Color(0xffb1d8b2),
                     ),
                     hintText: "Search Medicine ...",
-                    hintStyle: regulerTextStyle.copyWith(color: Color(0xffb1d8b2)),
+                    hintStyle:
+                        regulerTextStyle.copyWith(color: Color(0xffb1d8b2)),
                   ),
                 ),
               ),
@@ -157,7 +212,7 @@ class _HomePageState extends State<HomePage> {
                       });
                     },
                     child: CardCategory(
-                      imageCategory: x.image, 
+                      imageCategory: x.image,
                       nameCategory: x.category,
                     ),
                   );
@@ -174,35 +229,38 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 14,
             ),
-            filter 
-              ? index == 7 
-                ? Text("Feature on development") 
-                  : GridView.builder(
-                    physics: ClampingScrollPhysics(),
-                    itemCount: listCategory[index].product.length,
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                    ),
-                    itemBuilder: (context, i) {
-                      final y = listCategory[index].product[i];
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context, 
-                            MaterialPageRoute(
-                              builder: (context) => DetailProduct(productModel: y,)));
-                        },
-                        child: CardProduct(
-                          nameProduct: y.nameProduct, 
-                          imageProduct: y.imageProduct, 
-                          priceProduct: y.price,
+            filter
+                ? index == 7
+                    ? Text("Feature on development")
+                    : GridView.builder(
+                        physics: ClampingScrollPhysics(),
+                        itemCount: listCategory[index].product.length,
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
                         ),
-                      ); 
-                    },
-                  ) : GridView.builder(
+                        itemBuilder: (context, i) {
+                          final y = listCategory[index].product[i];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => DetailProduct(
+                                            productModel: y,
+                                          )));
+                            },
+                            child: CardProduct(
+                              nameProduct: y.nameProduct,
+                              imageProduct: y.imageProduct,
+                              priceProduct: y.price,
+                            ),
+                          );
+                        },
+                      )
+                : GridView.builder(
                     physics: ClampingScrollPhysics(),
                     itemCount: listProduct.length,
                     shrinkWrap: true,
@@ -216,16 +274,18 @@ class _HomePageState extends State<HomePage> {
                       return InkWell(
                         onTap: () {
                           Navigator.push(
-                            context, 
-                            MaterialPageRoute(
-                              builder: (context) => DetailProduct(productModel: y,)));
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DetailProduct(
+                                        productModel: y,
+                                      )));
                         },
                         child: CardProduct(
-                          nameProduct: y.nameProduct, 
-                          imageProduct: y.imageProduct, 
+                          nameProduct: y.nameProduct,
+                          imageProduct: y.imageProduct,
                           priceProduct: y.price,
                         ),
-                      ); 
+                      );
                     },
                   ),
           ],
@@ -234,4 +294,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
