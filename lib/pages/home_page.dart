@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => CartPage()));
+                                builder: (context) => CartPage(totalCart)));
                       },
                       icon: Icon(
                         Icons.shopping_cart_outlined,

@@ -5,6 +5,7 @@ import 'package:medical_healthcare/main_page.dart';
 import 'package:medical_healthcare/network/api/url_api.dart';
 import 'package:medical_healthcare/network/model/cart_model.dart';
 import 'package:medical_healthcare/network/model/pref_profile_model.dart';
+import 'package:medical_healthcare/pages/success_checkout.dart';
 import 'package:medical_healthcare/theme.dart';
 import 'package:medical_healthcare/widget/button_primary.dart';
 import 'package:medical_healthcare/widget/widget_ilustration.dart';
@@ -12,6 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class CartPage extends StatefulWidget {
+  final VoidCallback method;
+  CartPage(this.method);
   @override
   _CartPageState createState() => _CartPageState();
 }
@@ -65,12 +68,31 @@ class _CartPageState extends State<CartPage> {
       print(message);
       setState(() {
         getPref();
+        widget.method();
       });
     } else {
       print(message);
       setState(() {
         getPref();
       });
+    }
+  }
+
+  checkout() async {
+    var urlCheckout = Uri.parse(BASEURL.checkout);
+    final response = await http.post(urlCheckout, body: {
+      "idUser": userID,
+    });
+    final data = jsonDecode(response.body);
+    int value = data['value'];
+    String message = data['message'];
+    if (value == 1) {
+      Navigator.pushAndRemoveUntil(
+        context, 
+        MaterialPageRoute(builder: (context) => SuccessCheckout()), 
+        (route) => false);
+    } else {
+      print(message);
     }
   }
 
@@ -176,7 +198,9 @@ class _CartPageState extends State<CartPage> {
             Container(
               width: MediaQuery.of(context).size.width,
               child: ButtonPrimary(
-                onTap: () {},
+                onTap: () {
+                  checkout();
+                },
                 text: "CHECKOUT NOW",
               ),
             ),
