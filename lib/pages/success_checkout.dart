@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:medical_healthcare/main_page.dart';
 import 'package:medical_healthcare/widget/button_primary.dart';
 import 'package:medical_healthcare/widget/general_logo_space.dart';
 import 'package:medical_healthcare/widget/widget_ilustration.dart';
@@ -27,7 +28,12 @@ class SuccessCheckout extends StatelessWidget {
             ),
             ButtonPrimary(
               text: "BACK TO HOME",
-              onTap: () {},
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                  context, 
+                  MaterialPageRoute(builder: (context) => MainPage()), 
+                  (route) => false);
+              },
             ),
           ],
         ), 

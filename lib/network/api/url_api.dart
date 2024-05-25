@@ -9,5 +9,6 @@ class BASEURL {
   static String totalPriceCart = "http://localhost/medhealth_db/get_total_price.php?userID=";
   static String getTotalCart = "http://localhost/medhealth_db/total_cart.php?userID=";
   static String checkout = "http://localhost/medhealth_db/checkout.php";
+  static String historyOrder = "http://localhost/medhealth_db/get_history.php?id_user=";
 }
 
