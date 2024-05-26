@@ -67,7 +67,7 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
             SizedBox(
-              height: (list.length == 0) ? 80 : 20,
+              height: (list.length == 0) ? 60 : 20,
             ),
             list.length == 0
                 ? Center(
