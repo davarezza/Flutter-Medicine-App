@@ -165,18 +165,18 @@ class _HomePageState extends State<HomePage> {
                 height: 55,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: Color(0xffe4faf0)),
+                    color: Color(0xffe0f7fa)),
                 child: TextField(
                   enabled: false,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(
                       Icons.search,
-                      color: Color(0xffb1d8b2),
+                      color: Color(0xff0288d1),
                     ),
                     hintText: "Search Medicine ...",
                     hintStyle:
-                        regulerTextStyle.copyWith(color: Color(0xffb1d8b2)),
+                        regulerTextStyle.copyWith(color: Color(0xff0288d1)),
                   ),
                 ),
               ),
