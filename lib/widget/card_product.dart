@@ -20,11 +20,11 @@ class CardProduct extends StatelessWidget {
         children: [
           Image.network(
             imageProduct,
-            width: 115,
-            height: 76,
+            width: 98,
+            height: 64,
           ),
           SizedBox(
-            height: 16,
+            height: 10,
           ),
           Text(
             nameProduct,
@@ -32,7 +32,7 @@ class CardProduct extends StatelessWidget {
             textAlign: TextAlign.center,
             ),
           SizedBox(
-            height: 14,
+            height: 8,
           ),
           Text(
             "Rp " + priceFromat.format(int.parse(priceProduct)),
