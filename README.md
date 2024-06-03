@@ -33,13 +33,13 @@ Below are some screenshots to give you an idea of the app's user interface:
 |-----------|--------------|--------------------|
 | <img src="assets/screenshot/localhost_50243_ (6).png" width="100%"> | <img src="assets/screenshot/localhost_50243_ (7).png" width="100%"> | <img src="assets/screenshot/localhost_50243_ (8).png" width="100%"> |
 
-| Search Page |
-|-------------|
-| <img src="assets/screenshot/localhost_50243_ (9).png" width="100%"> |
+| Search Page | Empty History Order | Success Checkout |
+|-------------|---------------------|-----------------|
+| <img src="assets/screenshot/localhost_50243_ (9).png" width="100%"> | <img src="assets/screenshot/localhost_49663_.png" width="100%"> | <img src="assets/screenshot/localhost_49663_ (1).png" width="100%"> |
 
 ## Backend and Assets
 
-To get the assets folder and the backend code for the API using PHP, please send a direct message (DM) on Instagram to [@dvralz_](https://www.instagram.com/dvralz_/)
+To get the assets folder and the backend code for the API using PHP, please send a direct message (DM) on Instagram to [@dvralz_](https://www.instagram.com/dvralz_/).
 
 ## Getting Started
 
@@ -53,3 +53,7 @@ Here are a few resources to help you get started with Flutter:
 - [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
 For additional help with Flutter development, check out the [online documentation](https://docs.flutter.dev/), which provides tutorials, samples, guidance on mobile development, and a comprehensive API reference.
+
+---
+
+We hope this project serves as a solid foundation for your Flutter development journey. Happy coding!
